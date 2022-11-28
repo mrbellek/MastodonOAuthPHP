@@ -20,71 +20,65 @@ trait oAuth
     
     /**
      * Our API to use
-     * @var string
      */
-    private $mastodon_api_url = "mastodon.social";
+    private string $mastodon_api_url = 'mastodon.social';
     
     /**
      * Default headers for each request
-     * @var array
      */
-    private $headers = array(
-        "Content-Type" => "application/json; charset=utf-8", 
-        "Accept" => "*/*"
-    );
+    private array $headers = [
+        'Content-Type' => 'application/json; charset=utf-8', 
+        'Accept' => '*/*'
+    ];
         
     /**
      * Holds our client_id and secret
-     * @var array 
      */
-    private $credentials = array(
-        "client_id"     => "",
-        "client_secret" => "",
-        "bearer"        => ""
-    );
+    private array $credentials = [
+        'client_id'     => '',
+        'client_secret' => '',
+        'bearer'        => ''
+    ];
     
     /**
      * App config
-     * @var array
      */
-    private $app_config = array(
-        "client_name"   => "MastoTweet",
-        "redirect_uris" => "urn:ietf:wg:oauth:2.0:oob",
-        "scopes"        => "read write",
-        "website"       => "https://www.thecodingcompany.se"
-    );
+    private array $app_config = [
+        'client_name'   => 'MastoTweet',
+        'redirect_uris' => 'urn:ietf:wg:oauth:2.0:oob',
+        'scopes'        => 'read write',
+        'website'       => 'https://www.thecodingcompany.se'
+    ];
 
     /**
      * Set credentials
-     * @var array
      **/
-     public function setCredentials(array $credentials)
+     public function setCredentials(array $credentials): void
      {
         $this->credentials = $credentials;
      }
 
      /**
      * Set credentials
-     * @return array
      **/
-     public function getCredentials()
+     public function getCredentials(): array
      {
         return $this->credentials;
      }
     
     /**
      * Get the API endpoint
-     * @return string
      */
-    public function getApiURL(){
+    public function getApiURL(): string
+    {
         return "https://{$this->mastodon_api_url}";
     }
     
     /**
      * Get Request headers
-     * @return array
      */
-    public function getHeaders(){
+    public function getHeaders(): array
+    {
         if(isset($this->credentials["bearer"])){
             $this->headers["Authorization"] = "Bearer {$this->credentials["bearer"]}";
         }
@@ -94,7 +88,8 @@ trait oAuth
     /**
      * Start at getting or creating app
      */
-    public function getAppConfig(){
+    public function getAppConfig()
+    {
         //Get singleton instance
         $http = HttpRequest::Instance("https://{$this->mastodon_api_url}");
         $config = $http::post(
@@ -114,9 +109,9 @@ trait oAuth
     
     /**
      * Set the correct domain name
-     * @param string $domainname
      */
-    public function setMastodonDomain($domainname = ""){
+    public function setMastodonDomain(string $domainname = ""): void
+    {
         if(!empty($domainname)){
             $this->mastodon_api_url = $domainname;
         }
@@ -125,7 +120,8 @@ trait oAuth
     /**
      * Create authorization url
      */
-    public function getAuthUrl(){
+    public function getAuthUrl()
+    {
         if(is_array($this->credentials) && isset($this->credentials["client_id"])){
             
             //Return the Authorization URL
@@ -142,9 +138,10 @@ trait oAuth
     /**
      * Handle our bearer token info
      * @param array $token_info
-     * @return string | boolean
+     * @return string|boolean
      */
-    private function _handle_bearer($token_info = null){
+    private function _handle_bearer(array $token_info = null)
+    {
         if(!empty($token_info) && isset($token_info["access_token"])){
                 
             //Add to our credentials
@@ -158,10 +155,10 @@ trait oAuth
     /**
      * Get access token
      * @param string $auth_code
-     * @return string | bool
+     * @return string|bool
      */
-    public function getAccessToken($auth_code = ""){
-        
+    public function getAccessToken(string $auth_code = "")
+    {
         if(is_array($this->credentials) && isset($this->credentials["client_id"])){
             
             //Request access token in exchange for our Authorization token
@@ -190,10 +187,10 @@ trait oAuth
      * @param string $password The password
      * @return bool
      */
-    private function authUser($username = null, $password = null){
+    private function authUser(?string $username = null, ?string $password = null): bool
+    {
         if(!empty($username) && stristr($username, "@") !== FALSE && !empty($password)){
             
-
             if(is_array($this->credentials) && isset($this->credentials["client_id"])){
 
                 //Request access token in exchange for our Authorization token

@@ -17,34 +17,31 @@ final class HttpRequest
 {
     /**
      * Holds our base path. In most cases this is just /, but it can be /api for example
-     * @var string
      */
-    private static $base_path = "/";
+    private static string $base_path = "/";
 
     /**
      * Base URL without leading /
-     * @var string
      */
-    private static $base_url = "";
+    private static string $base_url = "";
     
     /**
      * Holds our instance
-     * @var array
      */
-    private static $instance = array();
+    private static array $instance = [];
     
     /**
      * Enable debugging
-     * @var bool
      */
-    private static $debug = false;
+    private static bool $debug = false;
 
     /**
      * Construct new HttpRequest
      * @param string $base_url Base url like http://api.website.com without leading /
      * @param string $base_path Base path like, / or /api
      */
-    protected function __construct($base_url = "", $base_path = "/") {            
+    protected function __construct(string $base_url = "", string $base_path = "/")
+    {            
         self::$base_path = $base_path;
         self::$base_url = $base_url;
     }
@@ -57,9 +54,10 @@ final class HttpRequest
      * @param string $base_path The endpoint. We start at /
      * @return HttpRequest instance
      */
-    public static function Instance($base_url = "", $base_path = "/"){
+    public static function Instance(string $base_url = "", string $base_path = "/"): HttpRequest
+    {
         $cls = get_called_class();
-        if(!isset(self::$instance[$cls])){
+        if (!isset(self::$instance[$cls])) {
             self::$instance[$cls] = new HttpRequest($base_url, $base_path);
         }
         return self::$instance[$cls];
@@ -72,12 +70,16 @@ final class HttpRequest
      * @param array $headers
      * @return bool
      */
-    public static function Post($path = "", $parameters = array(), $headers = array()){
+    public static function Post(
+        string $path = "",
+        array $parameters = [],
+        array $headers = []
+    ): bool {
         //Sen the request and return response
         $post_data = json_encode($parameters);
         return self::http_request(
             "POST", 
-            self::$base_url.self::$base_path.$path, 
+            self::$base_url . self::$base_path . $path, 
             $headers,
             $post_data
         );
@@ -88,10 +90,14 @@ final class HttpRequest
      * @param string $path
      * @param array $parameters
      * @param array $headers
-     * @return bool
+     * @return bool|array
      */
-    public static function Get($path = "", $parameters = array(), $headers = array()){
-        //Sen the request and return response
+    public static function Get(
+        string $path = "",
+        array $parameters = [],
+        array $headers = []
+    ) {
+        //Send the request and return response
         return self::http_request(
             "GET", 
             self::$base_url.self::$base_path.$path, 
@@ -101,15 +107,19 @@ final class HttpRequest
     }
 
     /**
-    * Buikd the HTTP request
+    * Build the HTTP request
     * @param string $method  GET|POST
     * @param string $url
     * @param array $headers
     * @param array $parameters
-    * @return boolean
+    * @return boolean|array
     */
-   private static function http_request($method = "GET", $url = "", $headers = array(), $parameters = array()) {
-
+   private static function http_request(
+       string $method = 'GET',
+       string $url = '',
+       array $headers = [],
+       array $parameters = []
+   ) {
         //HTTP request options
         $opts = array(
             'http' => array(
@@ -140,14 +150,12 @@ final class HttpRequest
             // If the method is get, append to the URL            
             if ($method == "GET") {
                 $url .= "?" . $content;
-            }
-            // Otherwise, post in the content
-            else {
+            } else {
+                // Otherwise, post in the content
                 //Strip first & sign
                 $opts["http"]["content"] = $content;
             }
-        }
-        elseif ($parameters) {
+        } elseif ($parameters) {
             //Send as is
             $opts["http"]["content"] = $parameters;
         }
@@ -186,16 +194,14 @@ final class HttpRequest
             
             if(self::$debug){ print_r($error); }
             return $error;
-        }
-        else{
+        } else {
             
             //Debug the response/url
             self::debug_response($url, $context);
             
             if (($json = \json_decode($response, true)) !== NULL) {
                 return $json;
-            }
-            else {
+            } else {
                 return $response;
             }
         }
@@ -206,22 +212,23 @@ final class HttpRequest
      * @param string $url
      * @param resource $context
      */
-    private static function debug_response($url, $context){
+    private static function debug_response(string $url, $context): void
+    {
         //Get and debug headers
-        if(self::$debug){
+        if (self::$debug) {
             //Get meta data for debugging
             $fp = @fopen($url, "r", false, $context);
-            if($fp){
+            if ($fp) {
                 $req_headers = stream_get_meta_data($fp);
-                if(isset($req_headers["wrapper_data"])){
+                if (isset($req_headers["wrapper_data"])) {
                     echo "<pre>".print_r($req_headers["wrapper_data"], true)."</pre>";
-                }else{
+                } else {
                     echo "<pre>".print_r($req_headers, true)."</pre>";
                 }
             }
             echo "<pre>Check host alive headers<br/>\r\n";
             $headers = @get_headers($url);
-            if($headers !== FALSE){
+            if ($headers !== false) {
                 print_r($headers);
             }
             echo "</pre>";

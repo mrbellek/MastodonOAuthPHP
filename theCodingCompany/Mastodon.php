@@ -22,21 +22,19 @@ class Mastodon
     
     /**
      * Holds our current user_id for :id in API calls
-     * @var string
      */
-    private $mastodon_user_id = null;
+    private ?string $mastodon_user_id = null;
     
     /**
      * Holds our current userinfo
-     * @var array
      */
-    private $mastodon_userinfo = null;
+    private ?array $mastodon_userinfo = null;
     
     /**
      * Construct new Mastodon class
      */
-    public function __construct($domainname = "mastodon.social") {        
-        
+    public function __construct($domainname = 'mastodon.social')
+    {
         //Set the domain name to use
         $this->setMastodonDomain($domainname);
     }
@@ -47,7 +45,8 @@ class Mastodon
      * @param string $website_url
      * @return array|bool
      */
-    public function createApp($name, $website_url){
+    public function createApp(string $name, string $website_url)
+    {
         if(!empty($name) && !empty($website_url)){
             
             //Set our info
@@ -65,7 +64,8 @@ class Mastodon
      * @param string $password
      * @return $this
      */
-    public function authenticate($username = null, $password = null) {
+    public function authenticate(?string $username = null, ?string $password = null): self
+    {
         $this->authUser($username, $password);
         
         //Set current working userid
@@ -78,9 +78,13 @@ class Mastodon
      * Post a new status to your {visibility} timeline
      * @param string $text
      * @param string $visibility
-     * @return HttpRequest | bool
+     * @return HttpRequest|bool
      */
-    public function postStatus($text = "", $visibility = "public", $in_reply_to_id = null){
+    public function postStatus(
+        string $text = "",
+        string $visibility = "public",
+        ?string $in_reply_to_id = null
+    ) {
         if(!empty($this->getCredentials())){
             
             $headers = $this->getHeaders();
@@ -104,13 +108,14 @@ class Mastodon
     /**
      * Get mastodon user
      */
-    public function getUser(){        
+    public function getUser()
+    {        
         if(empty($this->mastodon_userinfo)){
             //Create our object
             $http = HttpRequest::Instance($this->getApiURL());
             $user_info = $http::Get(
                 "api/v1/accounts/verify_credentials",
-                null,
+                [],
                 $this->getHeaders()
             );
             if(is_array($user_info) && isset($user_info["username"])){
@@ -126,7 +131,8 @@ class Mastodon
     /**
      * Get current user's followers
      */
-    public function getFollowers(){
+    public function getFollowers()
+    {
         if($this->mastodon_user_id > 0){
             
             //Create our object
@@ -147,7 +153,8 @@ class Mastodon
     /**
      * Get current user's following
      */
-    public function getFollowing(){
+    public function getFollowing()
+    {
         if($this->mastodon_user_id > 0){
             
             //Create our object
@@ -168,7 +175,8 @@ class Mastodon
     /**
      * Get current user's statuses
      */
-    public function getStatuses(){
+    public function getStatuses()
+    {
         if($this->mastodon_user_id > 0){
             
             //Create our object
@@ -191,7 +199,8 @@ class Mastodon
      * after since_id.
      * 
      */
-    public function getNotifications($since_id = null){
+    public function getNotifications($since_id = null)
+    {
         if($this->mastodon_user_id > 0){
             
             //Create our object
@@ -214,7 +223,8 @@ class Mastodon
      * Clears the user's notifications. Returns true if successful.
      * 
      */
-    public function clearNotifications(){
+    public function clearNotifications()
+    {
         if($this->mastodon_user_id > 0){
             
             //Create our object
@@ -235,5 +245,4 @@ class Mastodon
         }
         return false;
     }
-    
 }
